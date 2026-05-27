@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Открытие шоурума Stone Deco</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500&family=Golos+Text:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F5F3EE; --surface: #FFFFFF; --border: #E2DED6;
+    --text: #1A1816; --muted: #7A7570;
+    --accent: #2C5F4A; --accent-light: #EBF3EF; --accent-mid: #4A8C6E;
+    --danger: #C0392B; --radius: 14px; --radius-sm: 8px;
+  }
+  html { background: var(--bg); min-height: 100vh; }
+  body {
+    font-family: 'Golos Text', sans-serif; color: var(--text);
+    background: var(--bg); min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+  .wrap { width: 100%; max-width: 480px; }
+  .header { text-align: center; margin-bottom: 2rem; padding-top: 1rem; }
+  .logo-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; background: var(--accent);
+    border-radius: 16px; margin-bottom: 1.25rem;
+  }
+  .logo-mark svg { width: 28px; height: 28px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .date-chip {
+    display: inline-block; font-size: 12px;
+    font-family: 'Unbounded', sans-serif; font-weight: 400;
+    letter-spacing: 0.04em; color: var(--accent);
+    background: var(--accent-light); border-radius: 100px;
+    padding: 5px 14px; margin-bottom: 1rem;
+  }
+  h1 { font-family: 'Unbounded', sans-serif; font-size: 21px; font-weight: 500; line-height: 1.3; margin-bottom: 12px; }
+  .welcome {
+    font-size: 15px; color: var(--muted); line-height: 1.7;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem; text-align: left;
+  }
+  .welcome strong { color: var(--text); font-weight: 500; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  .field { margin-bottom: 1rem; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.05em; }
+  input[type="text"], input[type="tel"], input[type="email"] {
+    width: 100%; height: 48px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 0 14px;
+    font-family: 'Golos Text', sans-serif; font-size: 16px;
+    color: var(--text); background: var(--bg); outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus { border-color: var(--accent); background: #fff; }
+  .slots-heading { font-size: 13px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .slots-grid { display: flex; flex-direction: column; gap: 8px; }
+  .slot-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); cursor: pointer;
+    background: var(--bg); user-select: none;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  }
+  .slot-card:hover:not(.full):not(.selected) { border-color: var(--accent-mid); background: var(--accent-light); transform: translateY(-1px); }
+  .slot-card.selected { border-color: var(--accent); background: var(--accent-light); border-width: 2px; }
+  .slot-card.full { opacity: 0.4; cursor: not-allowed; }
+  .slot-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+  .slot-body { flex: 1; }
+  .slot-time { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .slot-sub { font-size: 12px; color: var(--muted); }
+  .slot-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 100px; margin-top: 5px; }
+  .badge-open { background: #E8F5E9; color: #2E7D32; }
+  .badge-full { background: #EFEBE9; color: #6D4C41; }
+  .badge-sel  { background: var(--accent); color: #fff; }
+  .check-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .slot-card.selected .check-circle { border-color: var(--accent); background: var(--accent); }
+  .check-circle svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.15s; }
+  .slot-card.selected .check-circle svg { opacity: 1; }
+  .submit-btn {
+    width: 100%; height: 52px; background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius-sm);
+    font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 500;
+    letter-spacing: 0.02em; cursor: pointer; margin-top: 1rem;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .submit-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .submit-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+  .submit-btn:active:not(:disabled) { transform: scale(0.99); }
+  .status-msg { font-size: 13px; text-align: center; margin-top: 10px; min-height: 18px; color: var(--muted); }
+  .status-msg.error { color: var(--danger); }
+  .loading { text-align: center; padding: 2rem; color: var(--muted); font-size: 14px; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .success { display: none; }
+  .success-inner { text-align: center; padding: 2rem 1.5rem; }
+  .success-icon { width: 72px; height: 72px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+  .success-icon svg { width: 34px; height: 34px; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  .success h2 { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 500; margin-bottom: 10px; }
+  .success-contact { margin-top: 1.5rem; background: var(--accent-light); border-radius: var(--radius-sm); padding: 14px 18px; font-size: 15px; color: var(--accent); font-weight: 500; }
+  .success-detail { margin-top: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; text-align: left; }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row span:first-child { color: var(--muted); }
+  .detail-row span:last-child { font-weight: 500; }
+  @media (max-width: 480px) { body { padding: 1.25rem 0.75rem 3rem; } h1 { font-size: 18px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="date-chip">17 июня 2026 · Петрозаводск</div>
+    <h1>Открытие шоурума Stone Deco</h1>
+  </div>
+
+  <div class="welcome">
+    <strong>Дорогой гость!</strong><br><br>
+    Мы рады пригласить вас в путешествие по нашему шоуруму натурального камня Stone Deco в Петрозаводске.<br><br>
+    Мы откроем шоурум официально 17 июня и приглашаем на закрытую церемонию.<br><br>
+    Мы создали пространство, в котором природный камень встречается с современным дизайном интерьера. Здесь выбирают и заказывают изделия из натурального камня Карелии, России и мира.<br><br>
+    Вас ждёт экскурсия по шоуруму, общение с командой и коллегами и розыгрыш премиального декора для дома.<br><br>
+    Выберите удобное время — каждый поток рассчитан на <strong>15 гостей</strong>, чтобы уделить внимание каждому.
+  </div>
+
+  <div id="booking-form">
+    <div class="card">
+      <div class="field">
+        <label class="field-label" for="g-name">Фамилия, имя, отчество</label>
+        <input type="text" id="g-name" placeholder="Иванов Иван Иванович" oninput="checkForm()" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="g-phone">Телефон</label>
+        <input type="tel" id="g-phone" placeholder="+7 (___) ___-__-__" oninput="phoneMask(this); checkForm()" autocomplete="tel" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="g-email">Email <span style="font-weight:400;text-transform:none;letter-spacing:0">(для подтверждения)</span></label>
+        <input type="email" id="g-email" placeholder="ivan@mail.ru" oninput="checkForm()" autocomplete="email" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="slots-heading">Выберите временной слот</div>
+      <div id="slots-loading" class="loading"><span class="spinner"></span>Загружаем актуальные данные...</div>
+      <div class="slots-grid" id="slots-grid" style="display:none"></div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" disabled onclick="submitBooking()">Подтвердить запись</button>
+    <div class="status-msg" id="status-msg"></div>
+  </div>
+
+  <div class="success" id="success-screen">
+    <div class="card">
+      <div class="success-inner">
+        <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <h2>Спасибо за регистрацию!</h2>
+        <div class="success-contact">Для связи: +7 981 410-18-88</div>
+        <div class="success-detail" id="success-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ0ekHooX1SB4pm5THn3_n7k3pkhxogqe9MXdRW6-U07wg1PA5CNgJP5MSbIs6GGGXCQ/exec';
+var MAX = 15;
+var SLOTS = [
+  { id: 's1', time: '10:30–12:00', label: 'Первый поток',    emoji: '🌿', iconBg: '#E8F5E9' },
+  { id: 's2', time: '13:00–14:30', label: 'Второй поток',    emoji: '☀️',  iconBg: '#FFF8E1' },
+  { id: 's3', time: '15:30–17:00', label: 'Третий поток',    emoji: '🍃', iconBg: '#F3E5F5' },
+  { id: 's4', time: '18:00–19:30', label: 'Четвёртый поток', emoji: '🌙', iconBg: '#E8EAF6' }
+];
+
+var counts = {};
+var selectedSlot = null;
+
+function getCount(label) { return counts[label] || 0; }
+
+function phoneMask(input) {
+  var v = input.value.replace(/\D/g, '');
+  if (v.charAt(0) === '8') v = '7' + v.slice(1);
+  if (v.charAt(0) !== '7' && v.length > 0) v = '7' + v;
+  v = v.slice(0, 11);
+  var res = '+7';
+  if (v.length > 1) res += ' (' + v.slice(1, 4);
+  if (v.length >= 4) res += ') ' + v.slice(4, 7);
+  if (v.length >= 7) res += '-' + v.slice(7, 9);
+  if (v.length >= 9) res += '-' + v.slice(9, 11);
+  input.value = res;
+}
+
+function phoneValid() {
+  var v = document.getElementById('g-phone').value.replace(/\D/g, '');
+  return v.length === 11;
+}
+
+function fetchCounts(cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', SCRIPT_URL + '?t=' + Date.now(), true);
+  xhr.onload = function() {
+    try { var d = JSON.parse(xhr.responseText); if (d.ok) counts = d.slots || {}; } catch(e) {}
+    cb();
+  };
+  xhr.onerror = function() { cb(); };
+  xhr.send();
+}
+
+function renderSlots() {
+  var grid = document.getElementById('slots-grid');
+  grid.innerHTML = '';
+  SLOTS.forEach(function(slot) {
+    var n = getCount(slot.label);
+    var full = n >= MAX;
+    var sel = selectedSlot === slot.id;
+    var badgeCls = full ? 'badge-full' : sel ? 'badge-sel' : 'badge-open';
+    var badgeTxt = full ? 'Мест нет' : sel ? 'Выбран' : 'Свободно ' + (MAX - n);
+    var card = document.createElement('div');
+    card.className = 'slot-card' + (full ? ' full' : '') + (sel ? ' selected' : '');
+    if (!full) card.onclick = (function(id) { return function() { selectedSlot = id; renderSlots(); checkForm(); }; })(slot.id);
+    card.innerHTML =
+      '<div class="slot-icon" style="background:' + slot.iconBg + '">' + slot.emoji + '</div>' +
+      '<div class="slot-body">' +
+        '<div class="slot-time">' + slot.time + '</div>' +
+        '<div class="slot-sub">' + slot.label + '</div>' +
+        '<span class="slot-badge ' + badgeCls + '">' + badgeTxt + '</span>' +
+      '</div>' +
+      '<div class="check-circle"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>';
+    grid.appendChild(card);
+  });
+}
+
+function initGuest() {
+  fetchCounts(function() {
+    document.getElementById('slots-loading').style.display = 'none';
+    document.getElementById('slots-grid').style.display = 'flex';
+    renderSlots();
+  });
+}
+
+function checkForm() {
+  var name = document.getElementById('g-name').value.trim();
+  document.getElementById('submit-btn').disabled = !(name.length > 1 && phoneValid() && selectedSlot);
+}
+
+function submitBooking() {
+  var name = document.getElementById('g-name').value.trim();
+  var phone = document.getElementById('g-phone').value.trim();
+  var email = document.getElementById('g-email').value.trim();
+  if (!name || !phoneValid() || !selectedSlot) return;
+
+  var slot = null;
+  for (var i = 0; i < SLOTS.length; i++) { if (SLOTS[i].id === selectedSlot) { slot = SLOTS[i]; break; } }
+
+  var btn = document.getElementById('submit-btn');
+  var msg = document.getElementById('status-msg');
+  btn.disabled = true; btn.textContent = 'Отправляем...';
+  msg.textContent = ''; msg.className = 'status-msg';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', SCRIPT_URL, true);
+  xhr.setRequestHeader('Content-Type', 'text/plain');
+  xhr.onload = function() {
+    try {
+      var d = JSON.parse(xhr.responseText);
+      if (d.ok) {
+        if (d.slots) counts = d.slots;
+        document.getElementById('booking-form').style.display = 'none';
+        document.getElementById('success-screen').style.display = 'block';
+        document.getElementById('success-detail').innerHTML =
+          '<div class="detail-row"><span>Участник</span><span>' + name + '</span></div>' +
+          '<div class="detail-row"><span>Телефон</span><span>' + phone + '</span></div>' +
+          '<div class="detail-row"><span>Поток</span><span>' + slot.time + ' — ' + slot.label + '</span></div>' +
+          '<div class="detail-row"><span>Дата</span><span>17 июня 2026</span></div>';
+      } else if (d.error === 'already_registered') {
+        msg.textContent = 'Этот номер телефона уже зарегистрирован.';
+        msg.className = 'status-msg error';
+        btn.disabled = false; btn.textContent = 'Подтвердить запись';
+      } else if (d.error === 'slot_full') {
+        msg.textContent = 'Этот слот только что заполнился. Выберите другой.';
+        msg.className = 'status-msg error';
+        if (d.slots) counts = d.slots;
+        renderSlots(); selectedSlot = null;
+        btn.disabled = false; btn.textContent = 'Подтвердить запись';
+      } else { throw new Error(d.error); }
+    } catch(e) {
+      msg.textContent = 'Ошибка. Попробуйте ещё раз.';
+      msg.className = 'status-msg error';
+      btn.disabled = false; btn.textContent = 'Подтвердить запись';
+    }
+  };
+  xhr.onerror = function() {
+    msg.textContent = 'Ошибка соединения. Попробуйте ещё раз.';
+    msg.className = 'status-msg error';
+    btn.disabled = false; btn.textContent = 'Подтвердить запись';
+  };
+  xhr.send(JSON.stringify({ name: name, phone: phone, email: email, slotTime: slot.time, slotLabel: slot.label }));
+}
+
+initGuest();
+</script>
+</body>
+</html>
